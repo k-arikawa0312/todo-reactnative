@@ -33,7 +33,7 @@ export default function TabLayout() {
           title: "Todo",
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
-              name={focused ? "home" : "home-outline"}
+              name={focused ? "checkmark-circle" : "checkmark-circle-outline"}
               color={color}
             />
           ),
