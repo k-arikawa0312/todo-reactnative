@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button } from "react-native";
+import { View, Text, TextInput, Button, StyleSheet } from "react-native";
 
 const Todo = () => {
   const [todos, setTodos] = useState<string[]>([]);
@@ -21,11 +21,27 @@ const Todo = () => {
       <TextInput
         value={newTodo}
         onChangeText={setNewTodo}
-        placeholder="Enter a new todo"
+        placeholder="新しく追加するTodo"
       />
-      <Button title="Add Todo" onPress={addTodo} />
+      <Button title="追加" onPress={addTodo} />
     </View>
   );
 };
 
 export default Todo;
+
+const styles = StyleSheet.create({
+  container: {
+    // add your container styles here
+  },
+  headerImage: {
+    color: "#808080",
+    bottom: -90,
+    left: -35,
+    position: "absolute",
+  },
+  titleContainer: {
+    flexDirection: "row",
+    gap: 8,
+  },
+});
