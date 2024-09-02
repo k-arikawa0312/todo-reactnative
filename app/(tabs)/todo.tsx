@@ -8,9 +8,6 @@ import {
   FlatList,
 } from "react-native";
 import { Icon } from "react-native-elements";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
 
 export default function App() {
   const [task, setTask] = useState(""); // 新しいタスクまたは編集中のタスクのテキスト
@@ -25,8 +22,11 @@ export default function App() {
   useEffect(() => {
     // アプリの初期化時にデータベースからタスクを読み込む
     const fetchTasks = async () => {
-      const dbTasks = await prisma.todo.findMany();
-      setTasks(dbTasks.map((t) => ({ id: t.id.toString(), text: t.title })));
+      const response = await fetch("http://localhost:8010/todo");
+      const dbTasks = await response.json();
+      setTasks(
+        dbTasks.map((t: any) => ({ id: t.id.toString(), text: t.title }))
+      );
     };
     fetchTasks();
   }, []);
@@ -34,28 +34,36 @@ export default function App() {
   const handleSaveTask = async () => {
     if (!task.trim()) return;
     if (isEditing) {
+      // タスクを編集
       setTasks(
         tasks.map((t) => (t.id === isEditing ? { ...t, text: task } : t))
       );
-      await prisma.todo.update({
-        where: { id: parseInt(isEditing) },
-        data: { title: task },
+      await fetch(`http://localhost:8010/todo/${isEditing}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ title: task, completed: false }),
       });
       setIsEditing(null);
     } else {
-      const newTask = { id: Date.now().toString(), text: task };
-      setTasks([...tasks, newTask]);
-      await prisma.todo.create({
-        data: { id: parseInt(newTask.id), title: newTask.text },
+      const response = await fetch("http://localhost:8010/todo", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ title: task }),
       });
+      const newTask = await response.json();
+      setTasks([...tasks, { id: newTask.id.toString(), text: newTask.title }]);
     }
     setTask("");
   };
 
   const handleDeleteTask = async (id: string) => {
     setTasks(tasks.filter((t) => t.id !== id));
-    await prisma.todo.delete({
-      where: { id: parseInt(id) },
+    await fetch(`http://localhost:8010/todo/${id}`, {
+      method: "DELETE",
     });
   };
 
