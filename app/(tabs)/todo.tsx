@@ -34,7 +34,6 @@ export default function App() {
   const handleSaveTask = async () => {
     if (!task.trim()) return;
     if (isEditing) {
-      // タスクを編集
       setTasks(
         tasks.map((t) => (t.id === isEditing ? { ...t, text: task } : t))
       );
